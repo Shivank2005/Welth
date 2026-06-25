@@ -1,0 +1,129 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id                    String                 @id
+  email                 String?
+  name                  String?
+  imageUrl              String?
+  baseCurrency          String                 @default("USD")
+  accounts              Account[]
+  transactions          Transaction[]
+  budgets               Budget[]
+  recurringTransactions RecurringTransaction[]
+  alerts                Alert[]
+  goals                 Goal[]
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @updatedAt
+}
+
+model Account {
+  id                    String                 @id @default(cuid())
+  name                  String
+  type                  String                 @default("CHECKING")
+  balance               Float                  @default(0)
+  currency              String                 @default("USD")
+  isDefault             Boolean                @default(false)
+  userId                String
+  user                  User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions          Transaction[]
+  recurringTransactions RecurringTransaction[]
+  goals                 Goal[]
+  plaidAccessToken      String?
+  plaidItemId           String?
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @updatedAt
+
+  @@index([userId])
+}
+
+model Transaction {
+  id          String   @id @default(cuid())
+  amount      Float
+  type        String
+  category    String
+  description String?
+  date        DateTime
+  userId      String
+  accountId   String
+  isRecurring Boolean  @default(false)
+  recurringId String?
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  account     Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  plaidTransactionId String? @unique
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([userId])
+  @@index([accountId])
+  @@index([date])
+}
+
+model Budget {
+  id        String   @id @default(cuid())
+  amount    Float
+  category  String
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model RecurringTransaction {
+  id          String   @id @default(cuid())
+  amount      Float
+  type        String
+  category    String
+  description String?
+  frequency   String   @default("MONTHLY")
+  nextDate    DateTime
+  userId      String
+  accountId   String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  account     Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([userId])
+  @@index([accountId])
+}
+
+model Alert {
+  id          String   @id @default(cuid())
+  type        String   // "BUDGET", "UNUSUAL_SPEND", "LOW_BALANCE", "UPCOMING_BILL", "MISSED_INCOME"
+  message     String
+  status      String   @default("PENDING") // "PENDING", "SENT", "FAILED"
+  referenceId String?  // Unique reference to prevent duplicate alerts (e.g. FOOD_2026_06_80)
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([userId])
+  @@index([type, referenceId])
+}
+
+model Goal {
+  id          String   @id @default(cuid())
+  name        String
+  target      Float
+  saved       Float    @default(0)
+  userId      String
+  accountId   String?
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  account     Account? @relation(fields: [accountId], references: [id], onDelete: SetNull)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([userId])
+  @@index([accountId])
+}

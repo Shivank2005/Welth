@@ -1,0 +1,60 @@
+// Use this schema when connecting to Supabase:
+// 1. Copy connection strings from Supabase → Connect → ORMs → Prisma
+// 2. Set DATABASE_URL and DIRECT_URL in .env
+// 3. Replace prisma/schema.prisma with this file (or rename)
+// 4. Run: npx prisma generate && npx prisma db push
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id           String        @id
+  email        String?
+  name         String?
+  imageUrl     String?
+  accounts     Account[]
+  transactions Transaction[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+}
+
+model Account {
+  id           String        @id @default(cuid())
+  name         String
+  type         String        @default("CHECKING")
+  balance      Float         @default(0)
+  isDefault    Boolean       @default(false)
+  userId       String
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions Transaction[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  @@index([userId])
+}
+
+model Transaction {
+  id          String   @id @default(cuid())
+  amount      Float
+  type        String
+  category    String
+  description String?
+  date        DateTime
+  userId      String
+  accountId   String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  account     Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([userId])
+  @@index([accountId])
+  @@index([date])
+}
