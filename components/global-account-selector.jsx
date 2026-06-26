@@ -1,5 +1,6 @@
 "use client";
 
+import { useTransition } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import {
   Select,
@@ -12,28 +13,42 @@ import {
 export default function GlobalAccountSelector({ accounts, currentAccountId }) {
   const router = useRouter();
   const pathname = usePathname();
+  const [isPending, startTransition] = useTransition();
 
   const handleAccountChange = (value) => {
-    if (value === "all") {
-      router.push(pathname);
-    } else {
-      router.push(`${pathname}?account=${value}`);
-    }
+    startTransition(() => {
+      if (value === "all") {
+        router.push(pathname);
+      } else {
+        router.push(`${pathname}?account=${value}`);
+      }
+    });
   };
 
   return (
-    <Select value={currentAccountId || "all"} onValueChange={handleAccountChange}>
-      <SelectTrigger className="w-[200px] shadow-sm font-medium">
-        <SelectValue placeholder="All Accounts" />
-      </SelectTrigger>
-      <SelectContent>
-        <SelectItem value="all">All Accounts (Global View)</SelectItem>
-        {accounts.map((account) => (
-          <SelectItem key={account.id} value={account.id}>
-            {account.name}
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
+    <div className="flex items-center gap-3">
+      {isPending && (
+        <span className="text-xs text-muted-foreground animate-pulse font-medium">
+          Loading Data...
+        </span>
+      )}
+      <Select 
+        value={currentAccountId || "all"} 
+        onValueChange={handleAccountChange}
+        disabled={isPending}
+      >
+        <SelectTrigger className={`w-[200px] shadow-sm font-medium ${isPending ? "opacity-50" : ""}`}>
+          <SelectValue placeholder="All Accounts" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">All Accounts (Global View)</SelectItem>
+          {accounts.map((account) => (
+            <SelectItem key={account.id} value={account.id}>
+              {account.name}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
   );
 }
