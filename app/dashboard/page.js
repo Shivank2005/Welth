@@ -29,8 +29,15 @@ export default async function DashboardPage({ searchParams }) {
   const accountParam = resolvedSearchParams?.account;
   const accountId = accountParam === "all" ? undefined : accountParam;
 
-  const { totalBalance, totalReserved, totalAvailable, totalIncome, totalGoalIncome, totalExpense, accounts, transactions, baseCurrency, monthlyData } =
-    await getDashboardData(user.id, accountId);
+  const dashboardDataPromise = getDashboardData(user.id, accountId);
+  const budgetDataPromise = getDefaultAccountBudget();
+
+  const [dashboardData, budgetData] = await Promise.all([
+    dashboardDataPromise,
+    budgetDataPromise,
+  ]);
+
+  const { totalBalance, totalReserved, totalAvailable, totalIncome, totalGoalIncome, totalExpense, accounts, transactions, baseCurrency, monthlyData } = dashboardData;
 
   const expensesByCategory = transactions
     .filter((tx) => tx.type === "EXPENSE")
@@ -46,8 +53,6 @@ export default async function DashboardPage({ searchParams }) {
   const currentMonthData = monthlyData[currentMonthIndex] || { income: 0, expense: 0, goalDeposits: 0 };
   const currentMonthRegularIncome = (currentMonthData.income || 0) - (currentMonthData.goalDeposits || 0);
   const currentMonthExpense = currentMonthData.expense || 0;
-
-  const budgetData = await getDefaultAccountBudget();
 
   return (
     <PageTransition className="container mx-auto space-y-8 px-4 py-8">

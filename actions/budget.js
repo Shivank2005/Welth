@@ -116,13 +116,14 @@ export async function getDefaultAccountBudget() {
   const user = await checkUser();
   if (!user) throw new Error("Unauthorized");
 
-  const budget = await db.budget.findFirst({
-    where: { userId: user.id, category: "DEFAULT_ACCOUNT" },
-  });
-
-  const defaultAccount = await db.account.findFirst({
-    where: { userId: user.id, isDefault: true },
-  });
+  const [budget, defaultAccount] = await Promise.all([
+    db.budget.findFirst({
+      where: { userId: user.id, category: "DEFAULT_ACCOUNT" },
+    }),
+    db.account.findFirst({
+      where: { userId: user.id, isDefault: true },
+    }),
+  ]);
 
   if (!defaultAccount) return null;
 
