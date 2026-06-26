@@ -2,7 +2,7 @@
 
 import { db } from "@/lib/prisma";
 import { checkUser } from "@/lib/checkUser";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 
 export async function getBudgets() {
   const user = await checkUser();
@@ -40,6 +40,7 @@ export async function upsertBudget(data) {
     });
   }
 
+  revalidateTag(`dashboard-data-${user.id}`);
   revalidatePath("/dashboard");
   revalidatePath("/dashboard/budgets");
   
@@ -112,8 +113,9 @@ export async function getBudgetProgress() {
   });
 }
 
-export async function getDefaultAccountBudget() {
-  const user = await checkUser();
+import { unstable_cache } from "next/cache";
+
+async function _getDefaultAccountBudget(user) {
   if (!user) throw new Error("Unauthorized");
 
   const [budget, defaultAccount] = await Promise.all([
@@ -153,7 +155,21 @@ export async function getDefaultAccountBudget() {
     spent,
     progress: amount > 0 ? Math.min((spent / amount) * 100, 100) : 0,
     isExceeded: spent > amount,
-  };
+}
+
+export async function getDefaultAccountBudget() {
+  const user = await checkUser();
+  if (!user) return null;
+
+  const cachedFn = unstable_cache(
+    async () => _getDefaultAccountBudget(user),
+    [`budget-data-${user.id}`],
+    {
+      tags: [`dashboard-data-${user.id}`],
+      revalidate: 3600,
+    }
+  );
+  return cachedFn();
 }
 
 export async function updateDefaultAccountBudget(amount) {
@@ -179,6 +195,7 @@ export async function updateDefaultAccountBudget(amount) {
     });
   }
 
+  revalidateTag(`dashboard-data-${user.id}`);
   revalidatePath("/dashboard");
   return { success: true };
 }
@@ -191,6 +208,7 @@ export async function deleteBudget(id) {
     where: { id, userId: user.id },
   });
 
+  revalidateTag(`dashboard-data-${user.id}`);
   revalidatePath("/dashboard");
   revalidatePath("/dashboard/budgets");
 

@@ -5,6 +5,7 @@ import {
   serverError,
   unauthorized,
 } from "@/lib/api";
+import { revalidateTag, revalidatePath } from "next/cache";
 
 export async function DELETE(request, { params }) {
   try {
@@ -31,6 +32,9 @@ export async function DELETE(request, { params }) {
         data: { balance: { increment: balanceDelta } },
       }),
     ]);
+
+    revalidateTag(`dashboard-data-${userId}`);
+    revalidatePath("/dashboard");
 
     return NextResponse.json({ success: true });
   } catch (error) {
@@ -98,6 +102,9 @@ export async function PUT(request, { params }) {
 
       return updated;
     });
+
+    revalidateTag(`dashboard-data-${userId}`);
+    revalidatePath("/dashboard");
 
     return NextResponse.json({ transaction });
   } catch (error) {

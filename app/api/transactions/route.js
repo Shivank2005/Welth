@@ -7,6 +7,7 @@ import {
   unauthorized,
 } from "@/lib/api";
 import { evaluateTransactionAlerts } from "@/lib/alerts";
+import { revalidateTag, revalidatePath } from "next/cache";
 
 export async function GET(request) {
   try {
@@ -120,6 +121,9 @@ export async function POST(request) {
 
     // Fire and forget alert evaluation
     evaluateTransactionAlerts(transaction);
+
+    revalidateTag(`dashboard-data-${userId}`);
+    revalidatePath("/dashboard");
 
     return NextResponse.json({ transaction }, { status: 201 });
   } catch (error) {
