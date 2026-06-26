@@ -28,7 +28,7 @@ export default function RootLayout({ children }) {
           <ThemeProvider
             attribute="class"
             defaultTheme="light"
-            enableSystem={false}
+            enableSystem={true}
             disableTransitionOnChange
           >
             <Header />
