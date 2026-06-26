@@ -152,7 +152,7 @@ export default function DashboardOverviewCards({
           >
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium text-slate-500 dark:text-slate-400">
-                This Month's Net Balance
+                This Month&apos;s Net Balance
               </CardTitle>
               <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-full">
                 <Wallet className="h-4 w-4 text-blue-600 dark:text-blue-400" />
@@ -199,7 +199,7 @@ export default function DashboardOverviewCards({
           >
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium text-slate-500 dark:text-slate-400">
-                This Month's Income
+                This Month&apos;s Income
               </CardTitle>
               <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-full">
                 <ArrowUpRight className="h-4 w-4 text-green-600 dark:text-green-400" />
@@ -241,7 +241,7 @@ export default function DashboardOverviewCards({
           >
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium text-slate-500 dark:text-slate-400">
-                This Month's Expenses
+                This Month&apos;s Expenses
               </CardTitle>
               <div className="p-2 bg-red-100 dark:bg-red-900/30 rounded-full">
                 <ArrowDownLeft className="h-4 w-4 text-red-600 dark:text-red-400" />

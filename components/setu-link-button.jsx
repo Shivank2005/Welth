@@ -121,7 +121,7 @@ export default function SetuLinkButton({ accountId }) {
           
           {filteredBanks.length === 0 && (
             <div className="col-span-2 text-center py-8 text-muted-foreground">
-              No banks found matching "{search}"
+              No banks found matching &quot;{search}&quot;
             </div>
           )}
         </div>

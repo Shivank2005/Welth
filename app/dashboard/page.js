@@ -55,7 +55,7 @@ export default async function DashboardPage({ searchParams }) {
         <div>
           <h1 className="text-3xl font-bold text-foreground bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/60">Welcome, {user.firstName || "there"}! 👋</h1>
           <p className="text-muted-foreground mt-1">
-            Here's an overview of your finances today.
+            Here&apos;s an overview of your finances today.
           </p>
         </div>
         <div className="flex items-center gap-4">
