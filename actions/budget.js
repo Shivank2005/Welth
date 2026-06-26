@@ -155,6 +155,7 @@ async function _getDefaultAccountBudget(user) {
     spent,
     progress: amount > 0 ? Math.min((spent / amount) * 100, 100) : 0,
     isExceeded: spent > amount,
+  };
 }
 
 export async function getDefaultAccountBudget() {
