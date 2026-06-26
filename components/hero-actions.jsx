@@ -24,11 +24,6 @@ export default function HeroActions() {
           Get Started
         </Button>
       </SignUpButton>
-      <Link href="#features">
-        <Button size="lg" variant="outline" className="px-8 border-gray-200 text-gray-900 hover:bg-gray-50 rounded-md font-medium">
-          Watch Demo
-        </Button>
-      </Link>
     </div>
   );
 }
